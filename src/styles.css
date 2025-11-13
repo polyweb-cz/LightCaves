@@ -1,0 +1,68 @@
+/* LightCaves - Global Styles */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --color-bg: #000000;
+  --color-fg: #ffffff;
+  --color-accent: #00ff00;
+  --color-beam: #ffff00;
+  --color-dim: #808080;
+  --font-size-base: 16px;
+  --font-family: 'Courier New', Courier, monospace;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+#app {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg);
+}
+
+canvas#gameCanvas {
+  display: block;
+  border: 2px solid var(--color-fg);
+  background-color: var(--color-bg);
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+#ui-root {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+/* Utility classes */
+.hidden {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
