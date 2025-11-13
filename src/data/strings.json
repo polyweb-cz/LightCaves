@@ -1,0 +1,54 @@
+{
+  "cs": {
+    "ui": {
+      "start_game": "Začít hru",
+      "level_select": "Výběr úrovně",
+      "settings": "Nastavení",
+      "credits": "Kredity",
+      "quit": "Zavřít",
+      "back": "Zpět",
+      "next_level": "Další úroveň",
+      "retry": "Zopakovat",
+      "main_menu": "Hlavní menu",
+      "reset": "Resetovat",
+      "reset_all": "Resetovat všechno"
+    },
+    "game": {
+      "level": "Úroveň",
+      "mirrors_available": "Dostupná zrcadla",
+      "level_complete": "Úroveň dokončena!",
+      "congratulations": "Gratulujeme!"
+    },
+    "settings": {
+      "language": "Jazyk",
+      "font_size": "Velikost fontu",
+      "volume": "Hlasitost"
+    }
+  },
+  "en": {
+    "ui": {
+      "start_game": "Start Game",
+      "level_select": "Level Select",
+      "settings": "Settings",
+      "credits": "Credits",
+      "quit": "Quit",
+      "back": "Back",
+      "next_level": "Next Level",
+      "retry": "Retry",
+      "main_menu": "Main Menu",
+      "reset": "Reset",
+      "reset_all": "Reset All"
+    },
+    "game": {
+      "level": "Level",
+      "mirrors_available": "Available Mirrors",
+      "level_complete": "Level Complete!",
+      "congratulations": "Congratulations!"
+    },
+    "settings": {
+      "language": "Language",
+      "font_size": "Font Size",
+      "volume": "Volume"
+    }
+  }
+}
