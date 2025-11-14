@@ -4,7 +4,7 @@
  */
 
 import { GRID_CONFIG, CELL_TYPES, DIRECTIONS } from '../utils/constants.js'
-import { Physics } from './physics.js'
+import { PhysicsEngine } from './physics.js'
 
 /**
  * Level class - represents a single level/puzzle
@@ -157,7 +157,7 @@ export class Level {
    * @returns {Array} Array of illuminated cells
    */
   calculateBeamPath() {
-    const physics = new Physics(this)
+    const physics = new PhysicsEngine(this)
     const beamPath = physics.calculateBeamPath()
     return beamPath
   }
