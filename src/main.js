@@ -12,6 +12,7 @@ import { MainMenu } from './ui/main-menu.js'
 import { LevelSelector } from './ui/level-selector.js'
 import { GameHUD } from './ui/game-hud.js'
 import { SettingsMenu } from './ui/settings-menu.js'
+import { PauseMenu } from './ui/pause-menu.js'
 import { Level } from './game/level.js'
 import { CELL_TYPES, DIRECTIONS } from './utils/constants.js'
 
@@ -20,6 +21,7 @@ console.log('LightCaves v0.1.0 loading...')
 let gameState = {
   isLoading: true,
   currentScene: 'menu', // menu, levelSelect, game
+  isPaused: false,
   canvas: null,
   renderer: null,
   gridRenderer: null,
@@ -31,6 +33,7 @@ let gameState = {
   levelSelector: null,
   gameHUD: null,
   settingsMenu: null,
+  pauseMenu: null,
 
   // Level data
   availableLevels: [
@@ -155,6 +158,18 @@ function initializeUI() {
 
   // Create settings menu
   gameState.settingsMenu = new SettingsMenu(gameState.renderer, gameState.uiRoot)
+
+  // Create pause menu
+  gameState.pauseMenu = new PauseMenu(gameState.renderer, gameState.uiRoot)
+  gameState.pauseMenu.on('resume', () => {
+    resumeGame()
+  })
+  gameState.pauseMenu.on('settings', () => {
+    showSettingsFromPause()
+  })
+  gameState.pauseMenu.on('menu', () => {
+    endGame()
+  })
 }
 
 // Show main menu scene
@@ -217,10 +232,45 @@ function showSettings() {
   console.log('[Main] Settings shown')
 }
 
+// Pause game
+function pauseGame() {
+  if (gameState.currentScene !== 'game' || gameState.isPaused) return
+
+  gameState.isPaused = true
+  gameState.pauseMenu.show()
+  console.log('[Main] Game paused')
+}
+
+// Resume game
+function resumeGame() {
+  if (!gameState.isPaused) return
+
+  gameState.isPaused = false
+  gameState.pauseMenu.hide()
+  console.log('[Main] Game resumed')
+}
+
+// Show settings from pause menu
+function showSettingsFromPause() {
+  gameState.pauseMenu.hide()
+  gameState.settingsMenu.show()
+
+  // When settings closes, return to pause menu
+  const originalHide = gameState.settingsMenu.hide.bind(gameState.settingsMenu)
+  gameState.settingsMenu.hide = function () {
+    originalHide()
+    pauseGame()
+  }
+
+  console.log('[Main] Settings shown from pause menu')
+}
+
 // End game and return to menu
 function endGame() {
   gameState.currentScene = 'menu'
+  gameState.isPaused = false
   gameState.gameHUD.hide()
+  gameState.pauseMenu.hide()
   gameState.currentLevel = null
   showMainMenu()
   console.log('[Main] Game ended')
@@ -272,6 +322,17 @@ function initializeApp() {
 
     // Initialize UI systems
     initializeUI()
+
+    // Add global keyboard listener for pause
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && gameState.currentScene === 'game') {
+        if (gameState.isPaused) {
+          resumeGame()
+        } else {
+          pauseGame()
+        }
+      }
+    })
 
     console.log('[Main] App initialized and ready')
     gameState.isLoading = false
