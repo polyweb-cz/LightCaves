@@ -8,6 +8,9 @@ import { GRID_CONFIG, COLORS } from './utils/constants.js'
 import { Renderer } from './rendering/renderer.js'
 import { GridRenderer } from './rendering/grid-renderer.js'
 import { InputHandler } from './utils/input-handler.js'
+import { MainMenu } from './ui/main-menu.js'
+import { LevelSelector } from './ui/level-selector.js'
+import { GameHUD } from './ui/game-hud.js'
 import { Level } from './game/level.js'
 import { CELL_TYPES, DIRECTIONS } from './utils/constants.js'
 
@@ -15,12 +18,24 @@ console.log('LightCaves v0.1.0 loading...')
 
 let gameState = {
   isLoading: true,
+  currentScene: 'menu', // menu, levelSelect, game
   canvas: null,
   renderer: null,
   gridRenderer: null,
   inputHandler: null,
   currentLevel: null,
-  animationFrameId: null
+  animationFrameId: null,
+  uiRoot: null,
+  mainMenu: null,
+  levelSelector: null,
+  gameHUD: null,
+
+  // Level data
+  availableLevels: [
+    { id: 'level-1', name: 'Tutorial', description: 'Learn the basics', difficulty: 'easy' },
+    { id: 'level-2', name: 'First Challenge', description: 'Your first real challenge', difficulty: 'normal' },
+    { id: 'level-3', name: 'Mirror Maze', description: 'Complex reflections', difficulty: 'hard' },
+  ]
 }
 
 // Initialize Canvas dimensions
@@ -45,23 +60,32 @@ function initializeCanvas() {
   return canvas
 }
 
-// Create a simple test level
-function createTestLevel() {
-  const mapData = {
-    width: 20,
-    height: 15,
-    grid: [],
-    lamp: { x: 2, y: 2, direction: DIRECTIONS.E },
-    target: { x: 17, y: 2, direction: DIRECTIONS.W },
-    metadata: { name: 'Demo Level', difficulty: 'Easy', maxMirrors: 5 }
+// Create a level by ID
+function createLevel(levelId) {
+  // Find level data
+  const levelData = gameState.availableLevels.find((l) => l.id === levelId)
+  if (!levelData) {
+    console.error(`[Main] Level not found: ${levelId}`)
+    return null
   }
 
-  // Create simple grid (all empty except walls on edges)
-  for (let y = 0; y < mapData.height; y++) {
+  // Create map based on difficulty
+  const width = 20
+  const height = 15
+  const mapData = {
+    width,
+    height,
+    grid: [],
+    lamp: { x: 2, y: 2, direction: DIRECTIONS.E },
+    target: { x: width - 3, y: 2, direction: DIRECTIONS.W },
+    metadata: { name: levelData.name, difficulty: levelData.difficulty, maxMirrors: 5 }
+  }
+
+  // Create grid (all empty except walls on edges)
+  for (let y = 0; y < height; y++) {
     mapData.grid[y] = []
-    for (let x = 0; x < mapData.width; x++) {
-      // Create border walls
-      if (x === 0 || x === mapData.width - 1 || y === 0 || y === mapData.height - 1) {
+    for (let x = 0; x < width; x++) {
+      if (x === 0 || x === width - 1 || y === 0 || y === height - 1) {
         mapData.grid[y][x] = CELL_TYPES.WALL
       } else {
         mapData.grid[y][x] = CELL_TYPES.EMPTY
@@ -76,7 +100,6 @@ function createTestLevel() {
 function initializeRenderers(canvas) {
   const renderer = new Renderer(canvas)
   const gridRenderer = new GridRenderer(renderer, null)
-
   return { renderer, gridRenderer }
 }
 
@@ -85,83 +108,182 @@ function initializeInput(canvas) {
   return new InputHandler(canvas)
 }
 
-// Game loop
-function gameLoop() {
-  if (!gameState.renderer || !gameState.gridRenderer || !gameState.currentLevel) {
-    gameState.animationFrameId = requestAnimationFrame(gameLoop)
+// Initialize UI systems
+function initializeUI() {
+  gameState.uiRoot = document.getElementById('ui-root') || document.body
+
+  // Create main menu
+  gameState.mainMenu = new MainMenu(gameState.renderer, gameState.uiRoot)
+  gameState.mainMenu.on('start', () => {
+    showLevelSelector()
+  })
+  gameState.mainMenu.on('settings', () => {
+    console.log('[Main] Settings clicked')
+  })
+  gameState.mainMenu.on('about', () => {
+    console.log('[Main] About clicked')
+  })
+  gameState.mainMenu.on('quit', () => {
+    console.log('[Main] Quit clicked')
+  })
+
+  // Create level selector
+  gameState.levelSelector = new LevelSelector(gameState.renderer, gameState.uiRoot, gameState.availableLevels)
+  gameState.levelSelector.on('levelSelected', (levelId) => {
+    startGame(levelId)
+  })
+  gameState.levelSelector.on('levelClosed', () => {
+    showMainMenu()
+  })
+
+  // Create game HUD
+  gameState.gameHUD = new GameHUD(gameState.renderer, gameState.uiRoot)
+  gameState.gameHUD.on('undo', () => {
+    console.log('[Main] Undo clicked')
+  })
+  gameState.gameHUD.on('redo', () => {
+    console.log('[Main] Redo clicked')
+  })
+  gameState.gameHUD.on('reset', () => {
+    console.log('[Main] Reset clicked')
+  })
+  gameState.gameHUD.on('menu', () => {
+    endGame()
+  })
+}
+
+// Show main menu scene
+function showMainMenu() {
+  gameState.currentScene = 'menu'
+  gameState.mainMenu.showMenu()
+  console.log('[Main] Showing main menu')
+}
+
+// Show level selector scene
+function showLevelSelector() {
+  gameState.currentScene = 'levelSelect'
+  gameState.mainMenu.hideMenu()
+  gameState.levelSelector.showLevelList()
+  console.log('[Main] Showing level selector')
+}
+
+// Start game with a level
+function startGame(levelId) {
+  gameState.currentScene = 'game'
+  gameState.levelSelector.hideLevelList()
+
+  // Create level
+  const level = createLevel(levelId)
+  if (!level) {
+    console.error('[Main] Failed to create level')
+    showLevelSelector()
     return
   }
 
-  // Clear canvas
-  gameState.renderer.clear()
+  gameState.currentLevel = level
+  gameState.gridRenderer.level = level
 
-  // Draw grid
-  gameState.gridRenderer.drawGrid()
+  // Show game HUD with stats
+  gameState.gameHUD.show()
+  gameState.gameHUD.updateStats({
+    levelName: level.metadata.name,
+    difficulty: level.metadata.difficulty,
+    moves: 0,
+    targetCount: 1,
+    illuminatedCount: 0,
+    time: 0
+  })
 
-  // Draw lamp and target
-  const lamp = gameState.currentLevel.lamp
-  const target = gameState.currentLevel.target
+  console.log('[Main] Game started with level:', levelId)
+}
 
-  // Simple rendering for demo
-  gameState.renderer.drawText('🔆', lamp.x * GRID_CONFIG.CELL_WIDTH_PX + 8, lamp.y * GRID_CONFIG.CELL_HEIGHT_PX + 10, COLORS.ACCENT)
-  gameState.renderer.drawText('◯', target.x * GRID_CONFIG.CELL_WIDTH_PX + 8, target.y * GRID_CONFIG.CELL_HEIGHT_PX + 10, COLORS.BEAM)
+// End game and return to menu
+function endGame() {
+  gameState.currentScene = 'menu'
+  gameState.gameHUD.hide()
+  gameState.currentLevel = null
+  showMainMenu()
+  console.log('[Main] Game ended')
+}
 
-  // Draw HUD
-  gameState.renderer.drawText('LightCaves Demo - Use mouse to explore', 10, gameState.canvas.height - 20, COLORS.TEXT)
+// Game loop
+function gameLoop() {
+  // Render only when in game scene
+  if (gameState.currentScene === 'game' && gameState.renderer && gameState.gridRenderer && gameState.currentLevel) {
+    gameState.renderer.clear()
+    gameState.gridRenderer.drawGrid()
+
+    // Draw entities
+    const lamp = gameState.currentLevel.lamp
+    const target = gameState.currentLevel.target
+    gameState.renderer.drawText('🔆', lamp.x * GRID_CONFIG.CELL_WIDTH_PX + 8, lamp.y * GRID_CONFIG.CELL_HEIGHT_PX + 10, COLORS.ACCENT)
+    gameState.renderer.drawText('◯', target.x * GRID_CONFIG.CELL_WIDTH_PX + 8, target.y * GRID_CONFIG.CELL_HEIGHT_PX + 10, COLORS.BEAM)
+  }
 
   gameState.animationFrameId = requestAnimationFrame(gameLoop)
 }
 
 // Initialize app
 function initializeApp() {
-  // Hide loading indicator
-  const loading = document.getElementById('loading')
-  if (loading) {
-    loading.style.display = 'none'
-  }
-
-  // Initialize canvas
-  const canvas = initializeCanvas()
-  if (!canvas) {
-    console.error('[Main] Failed to initialize canvas')
-    return
-  }
-
-  gameState.canvas = canvas
-
-  // Create test level first
-  const testLevel = createTestLevel()
-  gameState.currentLevel = testLevel
-
-  // Initialize renderers
   try {
-    const renderer = new Renderer(canvas)
-    const gridRenderer = new GridRenderer(renderer, testLevel)
+    // Hide loading indicator
+    const loading = document.getElementById('loading')
+    if (loading) {
+      loading.style.display = 'none'
+    }
+
+    // Initialize canvas
+    const canvas = initializeCanvas()
+    if (!canvas) {
+      console.error('[Main] Failed to initialize canvas')
+      showError('Canvas initialization failed')
+      return
+    }
+    gameState.canvas = canvas
+
+    // Initialize renderers
+    const { renderer, gridRenderer } = initializeRenderers(canvas)
     gameState.renderer = renderer
     gameState.gridRenderer = gridRenderer
-  } catch (error) {
-    console.error('[Main] Failed to initialize renderers:', error)
-    return
-  }
 
-  // Initialize input
-  try {
+    // Initialize input
     const input = initializeInput(canvas)
     gameState.inputHandler = input
 
-    // Log mouse clicks for demo
-    input.on('mouseClick', (data) => {
-      console.log(`[Main] Click at grid: ${data.gridX}, ${data.gridY}`)
-    })
+    // Initialize UI systems
+    initializeUI()
+
+    console.log('[Main] App initialized and ready')
+    gameState.isLoading = false
+
+    // Show main menu and start game loop
+    showMainMenu()
+    gameLoop()
   } catch (error) {
-    console.error('[Main] Failed to initialize input:', error)
+    console.error('[Main] Initialization error:', error)
+    showError(`Initialization failed: ${error.message}`)
   }
+}
 
-  console.log('[Main] App initialized and ready')
-  gameState.isLoading = false
-
-  // Start game loop
-  gameLoop()
+// Show error message
+function showError(message) {
+  const errorDiv = document.createElement('div')
+  errorDiv.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 0, 0, 0.9);
+    color: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    z-index: 2000;
+    font-family: Arial, sans-serif;
+    max-width: 500px;
+  `
+  errorDiv.textContent = message
+  document.body.appendChild(errorDiv)
 }
 
 // Start when DOM is ready
