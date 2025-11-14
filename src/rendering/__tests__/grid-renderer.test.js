@@ -53,8 +53,10 @@ describe('GridRenderer', () => {
       expect(() => new GridRenderer(null, testLevel)).toThrow('Invalid renderer')
     })
 
-    it('should throw error on null level', () => {
-      expect(() => new GridRenderer(mockRenderer, null)).toThrow('Invalid level')
+    it('should allow null level for deferred initialization', () => {
+      const renderer = new GridRenderer(mockRenderer, null)
+      expect(renderer.level).toBeNull()
+      expect(renderer.renderer).toBeDefined()
     })
   })
 

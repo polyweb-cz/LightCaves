@@ -15,12 +15,9 @@ export class GridRenderer {
    * @param {Renderer} renderer - The Renderer instance
    * @param {Level} level - The Level object to render
    */
-  constructor(renderer, level) {
+  constructor(renderer, level = null) {
     if (!renderer) {
       throw new Error('Invalid renderer')
-    }
-    if (!level) {
-      throw new Error('Invalid level')
     }
 
     this.renderer = renderer
@@ -28,7 +25,11 @@ export class GridRenderer {
     this.cellWidth = GRID_CONFIG.CELL_WIDTH_PX
     this.cellHeight = GRID_CONFIG.CELL_HEIGHT_PX
 
-    console.log('[GridRenderer] Initialized for', level.metadata.name || 'Unnamed')
+    if (level) {
+      console.log('[GridRenderer] Initialized for', level.metadata.name || 'Unnamed')
+    } else {
+      console.log('[GridRenderer] Initialized (level pending)')
+    }
   }
 
   /**
