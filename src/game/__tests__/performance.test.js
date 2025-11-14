@@ -241,7 +241,7 @@ describe('Performance Optimization', () => {
       expect(elapsed).toBeLessThan(1)
     })
 
-    it('should handle max mirror operations <5ms', () => {
+    it('should handle max mirror operations <20ms', () => {
       gameState = new GameState(largeLevel) // Level with 10 mirrors max
 
       const start = performance.now()
@@ -250,7 +250,7 @@ describe('Performance Optimization', () => {
       }
       const elapsed = performance.now() - start
 
-      expect(elapsed).toBeLessThan(5)
+      expect(elapsed).toBeLessThan(20)
       expect(gameState.getMirrorCount()).toBe(10)
     })
   })

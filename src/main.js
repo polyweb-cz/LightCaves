@@ -11,6 +11,7 @@ import { InputHandler } from './utils/input-handler.js'
 import { MainMenu } from './ui/main-menu.js'
 import { LevelSelector } from './ui/level-selector.js'
 import { GameHUD } from './ui/game-hud.js'
+import { SettingsMenu } from './ui/settings-menu.js'
 import { Level } from './game/level.js'
 import { CELL_TYPES, DIRECTIONS } from './utils/constants.js'
 
@@ -29,6 +30,7 @@ let gameState = {
   mainMenu: null,
   levelSelector: null,
   gameHUD: null,
+  settingsMenu: null,
 
   // Level data
   availableLevels: [
@@ -118,7 +120,7 @@ function initializeUI() {
     showLevelSelector()
   })
   gameState.mainMenu.on('settings', () => {
-    console.log('[Main] Settings clicked')
+    showSettings()
   })
   gameState.mainMenu.on('about', () => {
     console.log('[Main] About clicked')
@@ -150,6 +152,9 @@ function initializeUI() {
   gameState.gameHUD.on('menu', () => {
     endGame()
   })
+
+  // Create settings menu
+  gameState.settingsMenu = new SettingsMenu(gameState.renderer, gameState.uiRoot)
 }
 
 // Show main menu scene
@@ -195,6 +200,21 @@ function startGame(levelId) {
   })
 
   console.log('[Main] Game started with level:', levelId)
+}
+
+// Show settings menu
+function showSettings() {
+  gameState.mainMenu.hideMenu()
+  gameState.settingsMenu.show()
+
+  // When settings closes, return to menu
+  const originalHide = gameState.settingsMenu.hide.bind(gameState.settingsMenu)
+  gameState.settingsMenu.hide = function () {
+    originalHide()
+    showMainMenu()
+  }
+
+  console.log('[Main] Settings shown')
 }
 
 // End game and return to menu
