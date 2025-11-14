@@ -47,7 +47,25 @@ canvas#gameCanvas {
   left: 0;
   right: 0;
   bottom: 0;
-  pointer-events: none;
+}
+
+/* Enable pointer events for interactive UI elements */
+#main-menu,
+#level-selector,
+#game-hud {
+  pointer-events: auto;
+}
+
+/* Ensure all buttons are clickable */
+button {
+  pointer-events: auto;
+}
+
+/* Interactive form elements */
+input,
+select,
+textarea {
+  pointer-events: auto;
 }
 
 /* Utility classes */
