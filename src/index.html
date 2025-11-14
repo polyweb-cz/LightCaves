@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="LightCaves - Puzzle hra s paprsky a zrcadly">
+  <title>LightCaves</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Main game container -->
+  <div id="app" class="app">
+    <!-- Game canvas -->
+    <div class="game-container">
+      <canvas id="gameCanvas" class="canvas"></canvas>
+    </div>
+
+    <!-- Main UI root (for modals, menus, overlays) -->
+    <div id="ui-root" class="ui-root"></div>
+
+    <!-- Loading indicator -->
+    <div id="loading" class="loading">
+      <div class="loading-spinner"></div>
+      <p>LightCaves se načítá...</p>
+    </div>
+  </div>
+
+  <!-- Main application script -->
+  <script type="module" src="main.js"></script>
+
+  <!-- Fallback for no JavaScript -->
+  <noscript>
+    <div class="error-message">
+      <h1>JavaScript je vyžadováno</h1>
+      <p>Tato aplikace vyžaduje JavaScript. Prosím, povolte JavaScript ve vašem prohlížeči.</p>
+    </div>
+  </noscript>
+</body>
+</html>
