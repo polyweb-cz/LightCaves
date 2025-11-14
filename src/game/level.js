@@ -4,6 +4,7 @@
  */
 
 import { GRID_CONFIG, CELL_TYPES, DIRECTIONS } from '../utils/constants.js'
+import { Physics } from './physics.js'
 
 /**
  * Level class - represents a single level/puzzle
@@ -31,6 +32,10 @@ export class Level {
     this.lamp = mapData.lamp
     this.target = mapData.target
     this.metadata = mapData.metadata || {}
+
+    // Gameplay state
+    this.mirrors = []
+    this.illuminatedCells = new Set()
 
     this._validate()
     console.log(`[Level] Created: ${this.metadata.name || 'Unnamed'} (${this.width}×${this.height})`)
@@ -145,6 +150,16 @@ export class Level {
   isWall(x, y) {
     const cellType = this.getCellType(x, y)
     return cellType === CELL_TYPES.WALL
+  }
+
+  /**
+   * Calculate beam path with current mirrors
+   * @returns {Array} Array of illuminated cells
+   */
+  calculateBeamPath() {
+    const physics = new Physics(this)
+    const beamPath = physics.calculateBeamPath()
+    return beamPath
   }
 
   /**

@@ -205,6 +205,7 @@ function showLevelSelector() {
 function startGame(levelId) {
   gameState.currentScene = 'game'
   gameState.levelSelector.hideLevelList()
+  gameState.isPaused = false
 
   // Create level
   const level = createLevel(levelId)
@@ -217,18 +218,177 @@ function startGame(levelId) {
   gameState.currentLevel = level
   gameState.gridRenderer.level = level
 
+  // Initialize gameplay state
+  gameState.gameplayState = {
+    startTime: Date.now(),
+    moveCount: 0,
+    undoStack: [],
+    redoStack: [],
+    gameOver: false,
+    won: false
+  }
+
   // Show game HUD with stats
   gameState.gameHUD.show()
-  gameState.gameHUD.updateStats({
-    levelName: level.metadata.name,
-    difficulty: level.metadata.difficulty,
-    moves: 0,
-    targetCount: 1,
-    illuminatedCount: 0,
-    time: 0
-  })
+  updateGameStats()
+
+  // Add input event handlers for gameplay
+  setupGameplayInput()
 
   console.log('[Main] Game started with level:', levelId)
+}
+
+// Setup gameplay input handlers
+function setupGameplayInput() {
+  // Handle click to place mirrors
+  gameState.canvas.addEventListener('click', (event) => {
+    if (gameState.currentScene !== 'game' || gameState.isPaused || gameState.gameplayState?.gameOver) return
+    handleCellClick(event)
+  })
+
+  // Handle undo via HUD button
+  gameState.gameHUD.off?.('undo') // Remove old handler if exists
+  gameState.gameHUD.on('undo', () => {
+    if (gameState.gameplayState?.undoStack.length > 0) {
+      const state = gameState.gameplayState.undoStack.pop()
+      gameState.gameplayState.redoStack.push(JSON.parse(JSON.stringify(gameState.currentLevel.mirrors)))
+      gameState.currentLevel.mirrors = state
+      gameState.gameplayState.moveCount++
+      recalculateLight()
+      updateGameStats()
+    }
+  })
+
+  // Handle redo via HUD button
+  gameState.gameHUD.off?.('redo') // Remove old handler if exists
+  gameState.gameHUD.on('redo', () => {
+    if (gameState.gameplayState?.redoStack.length > 0) {
+      const state = gameState.gameplayState.redoStack.pop()
+      gameState.gameplayState.undoStack.push(JSON.parse(JSON.stringify(gameState.currentLevel.mirrors)))
+      gameState.currentLevel.mirrors = state
+      gameState.gameplayState.moveCount++
+      recalculateLight()
+      updateGameStats()
+    }
+  })
+
+  // Handle reset via HUD button
+  gameState.gameHUD.off?.('reset') // Remove old handler if exists
+  gameState.gameHUD.on('reset', () => {
+    if (confirm('Reset level and lose all progress?')) {
+      gameState.currentLevel.mirrors = []
+      gameState.gameplayState.moveCount = 0
+      gameState.gameplayState.undoStack = []
+      gameState.gameplayState.redoStack = []
+      recalculateLight()
+      updateGameStats()
+    }
+  })
+}
+
+// Handle clicking on a cell to place mirror
+function handleCellClick(event) {
+  const rect = gameState.canvas.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
+
+  const gridX = Math.floor(x / GRID_CONFIG.CELL_WIDTH_PX)
+  const gridY = Math.floor(y / GRID_CONFIG.CELL_HEIGHT_PX)
+
+  // Validate grid bounds
+  if (gridX < 0 || gridY < 0 || gridX >= gameState.currentLevel.width || gridY >= gameState.currentLevel.height) {
+    return
+  }
+
+  // Check if cell is empty
+  const cell = gameState.currentLevel.grid[gridY]?.[gridX]
+  if (cell !== CELL_TYPES.EMPTY) {
+    return
+  }
+
+  // Check if mirror already exists at this position
+  const existingMirror = gameState.currentLevel.mirrors.find((m) => m.x === gridX && m.y === gridY)
+  if (existingMirror) {
+    // Remove mirror (toggle)
+    gameState.gameplayState.undoStack.push(JSON.parse(JSON.stringify(gameState.currentLevel.mirrors)))
+    gameState.gameplayState.redoStack = []
+    gameState.currentLevel.mirrors = gameState.currentLevel.mirrors.filter(
+      (m) => !(m.x === gridX && m.y === gridY)
+    )
+    gameState.gameplayState.moveCount++
+    recalculateLight()
+    updateGameStats()
+    return
+  }
+
+  // Check max mirrors
+  if (gameState.currentLevel.mirrors.length >= gameState.currentLevel.metadata.maxMirrors) {
+    console.log('[Game] Max mirrors reached')
+    return
+  }
+
+  // Add new mirror (alternate between / and \\)
+  gameState.gameplayState.undoStack.push(JSON.parse(JSON.stringify(gameState.currentLevel.mirrors)))
+  gameState.gameplayState.redoStack = []
+
+  const lastMirror = gameState.currentLevel.mirrors[gameState.currentLevel.mirrors.length - 1]
+  const mirrorType = lastMirror?.type === '/' ? '\\' : '/'
+
+  gameState.currentLevel.mirrors.push({ x: gridX, y: gridY, type: mirrorType })
+  gameState.gameplayState.moveCount++
+
+  recalculateLight()
+  updateGameStats()
+}
+
+// Recalculate light path and check victory
+function recalculateLight() {
+  if (!gameState.currentLevel) return
+
+  // Calculate illuminated cells
+  const beamPath = gameState.currentLevel.calculateBeamPath()
+  gameState.currentLevel.illuminatedCells = new Set(
+    beamPath.map((cell) => `${cell.x},${cell.y}`)
+  )
+
+  // Check victory condition
+  const targetKey = `${gameState.currentLevel.target.x},${gameState.currentLevel.target.y}`
+  const isTargetIlluminated = gameState.currentLevel.illuminatedCells.has(targetKey)
+
+  if (isTargetIlluminated && !gameState.gameplayState.gameOver) {
+    gameState.gameplayState.gameOver = true
+    gameState.gameplayState.won = true
+    triggerVictory()
+  }
+}
+
+// Update game HUD stats
+function updateGameStats() {
+  if (!gameState.gameplayState) return
+
+  const elapsedSeconds = Math.floor((Date.now() - gameState.gameplayState.startTime) / 1000)
+  const illuminatedCount = gameState.currentLevel.illuminatedCells?.size || 0
+
+  gameState.gameHUD.updateStats({
+    levelName: gameState.currentLevel.metadata.name,
+    difficulty: gameState.currentLevel.metadata.difficulty,
+    moves: gameState.gameplayState.moveCount,
+    targetCount: 1,
+    illuminatedCount: Math.min(illuminatedCount, gameState.currentLevel.width * gameState.currentLevel.height),
+    time: elapsedSeconds
+  })
+}
+
+// Trigger victory screen
+function triggerVictory() {
+  const elapsedSeconds = Math.floor((Date.now() - gameState.gameplayState.startTime) / 1000)
+  gameState.gameHUD.hide()
+  gameState.gameOverScreen.showVictory({
+    time: elapsedSeconds,
+    moves: gameState.gameplayState.moveCount,
+    levelName: gameState.currentLevel.metadata.name
+  })
+  console.log('[Main] Victory! Time:', elapsedSeconds, 's, Moves:', gameState.gameplayState.moveCount)
 }
 
 // Show settings menu
@@ -323,7 +483,29 @@ function gameLoop() {
     gameState.renderer.clear()
     gameState.gridRenderer.drawGrid()
 
-    // Draw entities
+    // Draw illuminated cells with semi-transparent overlay
+    if (gameState.currentLevel.illuminatedCells && gameState.currentLevel.illuminatedCells.size > 0) {
+      gameState.currentLevel.illuminatedCells.forEach((cellKey) => {
+        const [x, y] = cellKey.split(',').map(Number)
+        gameState.renderer.drawRect(
+          x * GRID_CONFIG.CELL_WIDTH_PX,
+          y * GRID_CONFIG.CELL_HEIGHT_PX,
+          GRID_CONFIG.CELL_WIDTH_PX,
+          GRID_CONFIG.CELL_HEIGHT_PX,
+          COLORS.BEAM,
+          0.2
+        )
+      })
+    }
+
+    // Draw mirrors
+    gameState.currentLevel.mirrors.forEach((mirror) => {
+      const x = mirror.x * GRID_CONFIG.CELL_WIDTH_PX + GRID_CONFIG.CELL_WIDTH_PX / 2
+      const y = mirror.y * GRID_CONFIG.CELL_HEIGHT_PX + GRID_CONFIG.CELL_HEIGHT_PX / 2
+      gameState.renderer.drawText(mirror.type, x - 4, y + 5, COLORS.ACCENT)
+    })
+
+    // Draw lamp and target
     const lamp = gameState.currentLevel.lamp
     const target = gameState.currentLevel.target
     gameState.renderer.drawText('🔆', lamp.x * GRID_CONFIG.CELL_WIDTH_PX + 8, lamp.y * GRID_CONFIG.CELL_HEIGHT_PX + 10, COLORS.ACCENT)
