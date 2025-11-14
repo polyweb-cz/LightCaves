@@ -13,6 +13,7 @@ import { LevelSelector } from './ui/level-selector.js'
 import { GameHUD } from './ui/game-hud.js'
 import { SettingsMenu } from './ui/settings-menu.js'
 import { PauseMenu } from './ui/pause-menu.js'
+import { GameOverScreen } from './ui/game-over-screen.js'
 import { Level } from './game/level.js'
 import { CELL_TYPES, DIRECTIONS } from './utils/constants.js'
 
@@ -34,6 +35,7 @@ let gameState = {
   gameHUD: null,
   settingsMenu: null,
   pauseMenu: null,
+  gameOverScreen: null,
 
   // Level data
   availableLevels: [
@@ -83,7 +85,7 @@ function createLevel(levelId) {
     grid: [],
     lamp: { x: 2, y: 2, direction: DIRECTIONS.E },
     target: { x: width - 3, y: 2, direction: DIRECTIONS.W },
-    metadata: { name: levelData.name, difficulty: levelData.difficulty, maxMirrors: 5 }
+    metadata: { levelId, name: levelData.name, difficulty: levelData.difficulty, maxMirrors: 5 }
   }
 
   // Create grid (all empty except walls on edges)
@@ -168,6 +170,18 @@ function initializeUI() {
     showSettingsFromPause()
   })
   gameState.pauseMenu.on('menu', () => {
+    endGame()
+  })
+
+  // Create game over screen
+  gameState.gameOverScreen = new GameOverScreen(gameState.renderer, gameState.uiRoot)
+  gameState.gameOverScreen.on('restart', () => {
+    restartLevel()
+  })
+  gameState.gameOverScreen.on('next', () => {
+    nextLevel()
+  })
+  gameState.gameOverScreen.on('menu', () => {
     endGame()
   })
 }
@@ -271,9 +285,35 @@ function endGame() {
   gameState.isPaused = false
   gameState.gameHUD.hide()
   gameState.pauseMenu.hide()
+  gameState.gameOverScreen.hide()
   gameState.currentLevel = null
   showMainMenu()
   console.log('[Main] Game ended')
+}
+
+// Restart current level
+function restartLevel() {
+  const levelId = gameState.currentLevel?.metadata?.levelId || gameState.availableLevels[0].id
+  gameState.gameOverScreen.hide()
+  startGame(levelId)
+  console.log('[Main] Level restarted')
+}
+
+// Start next level
+function nextLevel() {
+  const currentLevelIndex = gameState.availableLevels.findIndex(
+    (l) => l.id === gameState.currentLevel?.metadata?.levelId
+  )
+  const nextIndex = currentLevelIndex + 1
+
+  if (nextIndex < gameState.availableLevels.length) {
+    gameState.gameOverScreen.hide()
+    startGame(gameState.availableLevels[nextIndex].id)
+    console.log('[Main] Next level started')
+  } else {
+    // No more levels, go to menu
+    endGame()
+  }
 }
 
 // Game loop
