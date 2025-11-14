@@ -139,4 +139,28 @@ export class PhysicsEngine {
 
     return isTargetHit && isCorrectDirection
   }
+
+  /**
+   * Get all illuminated cells from beam path
+   * @param {Level} level - Level object with lamp position
+   * @param {Array} beamPath - Calculated beam path
+   * @returns {Set} Set of illuminated cells as strings 'x,y'
+   */
+  getIlluminatedCells(level, beamPath) {
+    const illuminated = new Set()
+
+    // Add lamp position
+    if (level && level.lamp) {
+      illuminated.add(`${level.lamp.x},${level.lamp.y}`)
+    }
+
+    // Add all cells from beam path
+    if (beamPath && Array.isArray(beamPath)) {
+      beamPath.forEach(cell => {
+        illuminated.add(`${cell.x},${cell.y}`)
+      })
+    }
+
+    return illuminated
+  }
 }
