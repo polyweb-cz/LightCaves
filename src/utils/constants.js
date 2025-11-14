@@ -31,6 +31,7 @@ export const SYMBOLS = Object.freeze({
 export const COLORS = Object.freeze({
   BG: '#000000',
   FG: '#FFFFFF',
+  TEXT: '#FFFFFF',
   ACCENT: '#00FF00',
   BEAM: '#FFFF00',
   BEAM_DIM: '#808080'
