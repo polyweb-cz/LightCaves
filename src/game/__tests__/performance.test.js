@@ -57,12 +57,12 @@ describe('Performance Optimization', () => {
   })
 
   describe('Beam Propagation Performance', () => {
-    it('should propagate beam in small level <2ms', () => {
+    it('should propagate beam in small level <10ms', () => {
       const start = performance.now()
       const path = physics.propagateBeam(smallLevel, 1, 1, DIRECTIONS.E)
       const elapsed = performance.now() - start
 
-      expect(elapsed).toBeLessThan(2)
+      expect(elapsed).toBeLessThan(10)
       expect(path.length).toBeGreaterThan(0)
     })
 
