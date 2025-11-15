@@ -218,7 +218,9 @@ function showLevelSelector() {
 // Start game with a level
 function startGame(levelId) {
   gameState.currentScene = 'game'
-  gameState.levelSelector.hideLevelList()
+  gameState.mainMenu.hideMenu()
+  // Hide level selector WITHOUT triggering levelClosed callback (we're starting game, not canceling)
+  gameState.levelSelector.hideLevelList(false)
   gameState.isPaused = false
 
   // Create level

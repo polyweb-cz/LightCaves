@@ -1,0 +1,232 @@
+[
+  {
+    "type": "debug",
+    "text": "[vite] connecting...",
+    "timestamp": "2025-11-15T08:37:28.794Z"
+  },
+  {
+    "type": "debug",
+    "text": "[vite] connected.",
+    "timestamp": "2025-11-15T08:37:28.813Z"
+  },
+  {
+    "type": "log",
+    "text": "LightCaves v0.1.0 loading...",
+    "timestamp": "2025-11-15T08:37:28.834Z"
+  },
+  {
+    "type": "log",
+    "text": "[Main] Canvas initialized: 320×300px (20×15 cells)",
+    "timestamp": "2025-11-15T08:37:28.835Z"
+  },
+  {
+    "type": "log",
+    "text": "[Renderer] Initialized: 320×300px",
+    "timestamp": "2025-11-15T08:37:28.835Z"
+  },
+  {
+    "type": "log",
+    "text": "[GridRenderer] Initialized (level pending)",
+    "timestamp": "2025-11-15T08:37:28.835Z"
+  },
+  {
+    "type": "log",
+    "text": "[InputHandler] Initialized",
+    "timestamp": "2025-11-15T08:37:28.836Z"
+  },
+  {
+    "type": "log",
+    "text": "[MainMenu] Initialized",
+    "timestamp": "2025-11-15T08:37:28.836Z"
+  },
+  {
+    "type": "log",
+    "text": "[LevelSelector] Initialized with 6 levels",
+    "timestamp": "2025-11-15T08:37:28.836Z"
+  },
+  {
+    "type": "log",
+    "text": "[GameHUD] Initialized",
+    "timestamp": "2025-11-15T08:37:28.836Z"
+  },
+  {
+    "type": "log",
+    "text": "[SettingsMenu] Initialized",
+    "timestamp": "2025-11-15T08:37:28.837Z"
+  },
+  {
+    "type": "log",
+    "text": "[Main] App initialized and ready",
+    "timestamp": "2025-11-15T08:37:28.837Z"
+  },
+  {
+    "type": "log",
+    "text": "[Main] showMainMenu() called",
+    "timestamp": "2025-11-15T08:37:28.837Z"
+  },
+  {
+    "type": "log",
+    "text": "[MainMenu] showMenu() called, isVisible: false",
+    "timestamp": "2025-11-15T08:37:28.837Z"
+  },
+  {
+    "type": "log",
+    "text": "[MainMenu] Creating and showing menu element",
+    "timestamp": "2025-11-15T08:37:28.837Z"
+  },
+  {
+    "type": "log",
+    "text": "[MainMenu] Menu shown",
+    "timestamp": "2025-11-15T08:37:28.837Z"
+  },
+  {
+    "type": "log",
+    "text": "[Main] Main menu shown",
+    "timestamp": "2025-11-15T08:37:28.837Z"
+  },
+  {
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "timestamp": "2025-11-15T08:37:28.860Z"
+  },
+  {
+    "type": "log",
+    "text": "[Main] showLevelSelector() called",
+    "timestamp": "2025-11-15T08:37:31.389Z"
+  },
+  {
+    "type": "log",
+    "text": "[MainMenu] hideMenu() called, isVisible: true",
+    "timestamp": "2025-11-15T08:37:31.389Z"
+  },
+  {
+    "type": "log",
+    "text": "[MainMenu] Removing menu element from DOM",
+    "timestamp": "2025-11-15T08:37:31.390Z"
+  },
+  {
+    "type": "log",
+    "text": "[MainMenu] Menu hidden successfully",
+    "timestamp": "2025-11-15T08:37:31.390Z"
+  },
+  {
+    "type": "log",
+    "text": "[LevelSelector] List shown with 6 levels",
+    "timestamp": "2025-11-15T08:37:31.393Z"
+  },
+  {
+    "type": "log",
+    "text": "[Main] Level selector shown",
+    "timestamp": "2025-11-15T08:37:31.393Z"
+  },
+  {
+    "type": "log",
+    "text": "[MainMenu] Button clicked: start",
+    "timestamp": "2025-11-15T08:37:31.393Z"
+  },
+  {
+    "type": "log",
+    "text": "[Main] startGame() called with levelId: tutorial-1",
+    "timestamp": "2025-11-15T08:37:32.900Z"
+  },
+  {
+    "type": "log",
+    "text": "[Main] currentScene set to game",
+    "timestamp": "2025-11-15T08:37:32.900Z"
+  },
+  {
+    "type": "log",
+    "text": "[MainMenu] hideMenu() called, isVisible: false",
+    "timestamp": "2025-11-15T08:37:32.901Z"
+  },
+  {
+    "type": "log",
+    "text": "[MainMenu] hideMenu() returning early - already hidden",
+    "timestamp": "2025-11-15T08:37:32.901Z"
+  },
+  {
+    "type": "log",
+    "text": "[Main] Called mainMenu.hideMenu()",
+    "timestamp": "2025-11-15T08:37:32.901Z"
+  },
+  {
+    "type": "log",
+    "text": "[Main] showMainMenu() called",
+    "timestamp": "2025-11-15T08:37:32.901Z"
+  },
+  {
+    "type": "log",
+    "text": "[MainMenu] showMenu() called, isVisible: false",
+    "timestamp": "2025-11-15T08:37:32.902Z"
+  },
+  {
+    "type": "log",
+    "text": "[MainMenu] Creating and showing menu element",
+    "timestamp": "2025-11-15T08:37:32.902Z"
+  },
+  {
+    "type": "log",
+    "text": "[MainMenu] Menu shown",
+    "timestamp": "2025-11-15T08:37:32.902Z"
+  },
+  {
+    "type": "log",
+    "text": "[Main] Main menu shown",
+    "timestamp": "2025-11-15T08:37:32.902Z"
+  },
+  {
+    "type": "log",
+    "text": "[LevelSelector] List hidden",
+    "timestamp": "2025-11-15T08:37:32.902Z"
+  },
+  {
+    "type": "log",
+    "text": "[Main] Called levelSelector.hideLevelList()",
+    "timestamp": "2025-11-15T08:37:32.903Z"
+  },
+  {
+    "type": "log",
+    "text": "[Level] Created: Tutorial: The Basics (20×15)",
+    "timestamp": "2025-11-15T08:37:32.903Z"
+  },
+  {
+    "type": "log",
+    "text": "[Main] Created level: Tutorial: The Basics (easy, max 1 mirrors)",
+    "timestamp": "2025-11-15T08:37:32.903Z"
+  },
+  {
+    "type": "log",
+    "text": "[Main] Level created and assigned to gridRenderer",
+    "timestamp": "2025-11-15T08:37:32.904Z"
+  },
+  {
+    "type": "log",
+    "text": "[Main] About to show gameHUD",
+    "timestamp": "2025-11-15T08:37:32.904Z"
+  },
+  {
+    "type": "log",
+    "text": "[GameHUD] Shown",
+    "timestamp": "2025-11-15T08:37:32.905Z"
+  },
+  {
+    "type": "log",
+    "text": "[Main] gameHUD shown and stats updated",
+    "timestamp": "2025-11-15T08:37:32.905Z"
+  },
+  {
+    "type": "log",
+    "text": "[Main] Gameplay input setup complete",
+    "timestamp": "2025-11-15T08:37:32.906Z"
+  },
+  {
+    "type": "log",
+    "text": "[Main] Game started with level: tutorial-1",
+    "timestamp": "2025-11-15T08:37:32.906Z"
+  },
+  {
+    "type": "log",
+    "text": "[LevelSelector] Level selected: tutorial-1",
+    "timestamp": "2025-11-15T08:37:32.906Z"
+  }
+]

@@ -1,0 +1,110 @@
+[
+  {
+    "type": "debug",
+    "text": "[vite] connecting..."
+  },
+  {
+    "type": "debug",
+    "text": "[vite] connected."
+  },
+  {
+    "type": "log",
+    "text": "LightCaves v0.1.0 loading..."
+  },
+  {
+    "type": "log",
+    "text": "[Main] Canvas initialized: 320×300px (20×15 cells)"
+  },
+  {
+    "type": "log",
+    "text": "[Renderer] Initialized: 320×300px"
+  },
+  {
+    "type": "log",
+    "text": "[GridRenderer] Initialized (level pending)"
+  },
+  {
+    "type": "log",
+    "text": "[InputHandler] Initialized"
+  },
+  {
+    "type": "log",
+    "text": "[MainMenu] Initialized"
+  },
+  {
+    "type": "log",
+    "text": "[LevelSelector] Initialized with 6 levels"
+  },
+  {
+    "type": "log",
+    "text": "[GameHUD] Initialized"
+  },
+  {
+    "type": "log",
+    "text": "[SettingsMenu] Initialized"
+  },
+  {
+    "type": "log",
+    "text": "[Main] App initialized and ready"
+  },
+  {
+    "type": "log",
+    "text": "[Main] showMainMenu() called"
+  },
+  {
+    "type": "log",
+    "text": "[MainMenu] showMenu() called, isVisible: false"
+  },
+  {
+    "type": "log",
+    "text": "[MainMenu] Creating and showing menu element"
+  },
+  {
+    "type": "log",
+    "text": "[MainMenu] Menu shown"
+  },
+  {
+    "type": "log",
+    "text": "[Main] Main menu shown"
+  },
+  {
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "type": "log",
+    "text": "[EVALUATE] Found button: Start Game"
+  },
+  {
+    "type": "log",
+    "text": "[Main] showLevelSelector() called"
+  },
+  {
+    "type": "log",
+    "text": "[MainMenu] hideMenu() called, isVisible: true"
+  },
+  {
+    "type": "log",
+    "text": "[MainMenu] Removing menu element from DOM"
+  },
+  {
+    "type": "log",
+    "text": "[MainMenu] Menu hidden successfully"
+  },
+  {
+    "type": "log",
+    "text": "[LevelSelector] List shown with 6 levels"
+  },
+  {
+    "type": "log",
+    "text": "[Main] Level selector shown"
+  },
+  {
+    "type": "log",
+    "text": "[MainMenu] Button clicked: start"
+  },
+  {
+    "type": "log",
+    "text": "[EVALUATE] Found tutorial button: "
+  }
+]

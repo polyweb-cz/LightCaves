@@ -439,8 +439,9 @@ export class LevelSelector {
 
   /**
    * Hide the level selector
+   * @param {boolean} triggerCallback - Whether to trigger the levelClosed callback (default true)
    */
-  hideLevelList() {
+  hideLevelList(triggerCallback = true) {
     if (!this.isVisible) return
 
     this.isVisible = false
@@ -452,9 +453,12 @@ export class LevelSelector {
 
     document.removeEventListener('keydown', this.boundKeyHandler)
 
-    const callback = this.callbacks.levelClosed
-    if (callback && typeof callback === 'function') {
-      callback()
+    // Only trigger callback if requested (e.g., don't trigger when starting a game)
+    if (triggerCallback) {
+      const callback = this.callbacks.levelClosed
+      if (callback && typeof callback === 'function') {
+        callback()
+      }
     }
 
     console.log('[LevelSelector] List hidden')
