@@ -15,6 +15,7 @@ import { SettingsMenu } from './ui/settings-menu.js'
 import { PauseMenu } from './ui/pause-menu.js'
 import { GameOverScreen } from './ui/game-over-screen.js'
 import { Level } from './game/level.js'
+import { LEVEL_DATABASE, getAllLevels, getLevelData, isLevelUnlocked } from './game/level-database.js'
 import { CELL_TYPES, DIRECTIONS } from './utils/constants.js'
 
 console.log('LightCaves v0.1.0 loading...')
@@ -38,11 +39,13 @@ let gameState = {
   gameOverScreen: null,
 
   // Level data
-  availableLevels: [
-    { id: 'level-1', name: 'Tutorial', description: 'Learn the basics', difficulty: 'easy' },
-    { id: 'level-2', name: 'First Challenge', description: 'Your first real challenge', difficulty: 'normal' },
-    { id: 'level-3', name: 'Mirror Maze', description: 'Complex reflections', difficulty: 'hard' },
-  ]
+  availableLevels: getAllLevels().map((level) => ({
+    id: level.id,
+    name: level.name,
+    description: level.description,
+    difficulty: level.difficulty
+  })),
+  completedLevels: []
 }
 
 // Initialize Canvas dimensions
@@ -69,38 +72,49 @@ function initializeCanvas() {
 
 // Create a level by ID
 function createLevel(levelId) {
-  // Find level data
-  const levelData = gameState.availableLevels.find((l) => l.id === levelId)
-  if (!levelData) {
-    console.error(`[Main] Level not found: ${levelId}`)
+  // Get level data from database
+  const levelDefData = getLevelData(levelId)
+  if (!levelDefData) {
+    console.error(`[Main] Level not found in database: ${levelId}`)
     return null
   }
 
-  // Create map based on difficulty
-  const width = 20
-  const height = 15
-  const mapData = {
-    width,
-    height,
-    grid: [],
-    lamp: { x: 2, y: 2, direction: DIRECTIONS.E },
-    target: { x: width - 3, y: 2, direction: DIRECTIONS.W },
-    metadata: { levelId, name: levelData.name, difficulty: levelData.difficulty, maxMirrors: 5 }
-  }
+  const { width, height, lamp, target, walls, maxMirrors, name, difficulty } = levelDefData
 
-  // Create grid (all empty except walls on edges)
+  // Create grid (all empty)
+  const grid = []
   for (let y = 0; y < height; y++) {
-    mapData.grid[y] = []
+    grid[y] = []
     for (let x = 0; x < width; x++) {
-      if (x === 0 || x === width - 1 || y === 0 || y === height - 1) {
-        mapData.grid[y][x] = CELL_TYPES.WALL
-      } else {
-        mapData.grid[y][x] = CELL_TYPES.EMPTY
-      }
+      grid[y][x] = CELL_TYPES.EMPTY
     }
   }
 
-  return new Level(mapData)
+  // Place walls
+  walls.forEach((wall) => {
+    if (grid[wall.y] && grid[wall.y][wall.x] !== undefined) {
+      grid[wall.y][wall.x] = CELL_TYPES.WALL
+    }
+  })
+
+  // Create level data with exact specifications
+  const mapData = {
+    width,
+    height,
+    grid,
+    lamp,
+    target,
+    metadata: {
+      levelId,
+      name,
+      difficulty,
+      maxMirrors
+    }
+  }
+
+  const level = new Level(mapData)
+  console.log(`[Main] Created level: ${name} (${difficulty}, max ${maxMirrors} mirrors)`)
+  return level
 }
 
 // Initialize renderers
